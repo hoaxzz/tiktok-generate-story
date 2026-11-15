@@ -215,17 +215,32 @@
       const res = await rawFetch("/api/config");
       const data = await res.json();
       const badge = $("cookiesStatusBadge");
+      const delBtn = $("deleteCookiesBtn");
       if (badge) {
         if (data.cookies_installed && data.cookies_has_login) {
-          badge.innerHTML = '<span class="text-emerald-400 font-semibold">✅ Akun Login Terverifikasi</span>';
+          badge.innerHTML = '<span class="text-emerald-400 font-semibold">✅ Terpasang (Akun Login)</span>';
+          delBtn?.classList.remove("hidden");
         } else if (data.cookies_installed) {
-          badge.innerHTML = '<span class="text-amber-400 font-medium">⚠️ Terpasang TAPI Tanpa Akun Login (Login dulu di YouTube!)</span>';
+          badge.innerHTML = '<span class="text-amber-400 font-medium">⚠️ Terpasang (Tanpa Login)</span>';
+          delBtn?.classList.remove("hidden");
         } else {
-          badge.innerHTML = '<span class="text-zinc-500">Belum Terpasang</span>';
+          badge.innerHTML = '<span class="text-zinc-500">Tidak Digunakan (Mode VisionOS Buka Langsung)</span>';
+          delBtn?.classList.add("hidden");
         }
       }
     } catch {}
   }
+
+  $("deleteCookiesBtn")?.addEventListener("click", async () => {
+    if (!confirm("Hapus file cookies.txt dari VPS? (Sistem akan kembali menggunakan unduhan langsung VisionOS)")) return;
+    try {
+      await rawFetch("/api/cookies", { method: "DELETE" });
+      alert("File cookies.txt berhasil dihapus.");
+      loadCookiesStatus();
+    } catch (err) {
+      alert(`Gagal menghapus cookies: ${err.message}`);
+    }
+  });
 
   $("cookiesFileInput")?.addEventListener("change", async (e) => {
     const file = e.target.files?.[0];

@@ -223,19 +223,6 @@ def download_youtube_video(
         },
     }
 
-    cookies_file, has_login = check_cookies_status()
-    if cookies_file:
-        ydl_opts["cookiefile"] = str(cookies_file.resolve())
-        if progress_cb:
-            status_text = "dengan akun terverifikasi" if has_login else "PERINGATAN: tanpa sesi login"
-            progress_cb(2.0, f"Menggunakan cookies ({status_text})...")
-
-    ydl_opts["extractor_args"] = {
-        "youtube": {
-            "player_client": ["visionos", "web"]
-        }
-    }
-
     def _attempt_dl(opts_to_use: dict) -> Tuple[Path, str]:
         with yt_dlp.YoutubeDL(opts_to_use) as ydl:
             info = ydl.extract_info(url, download=True)
@@ -254,18 +241,26 @@ def download_youtube_video(
                     raise FileNotFoundError("File hasil unduhan yt-dlp tidak ditemukan.")
                 return matches[0], video_title
 
+    # Strategy 1: visionos client WITHOUT cookies (bypasses bot-walls and format blocks on VPS)
+    opts_visionos = dict(ydl_opts)
+    opts_visionos["extractor_args"] = {"youtube": {"player_client": ["visionos"]}}
+
     try:
-        final_path, video_title = _attempt_dl(ydl_opts)
-    except Exception as primary_err:
-        if progress_cb:
-            progress_cb(5.0, "Mencoba jalur alternatif YouTube...")
-        # Fallback 1: remove custom player_client
-        fb_opts = dict(ydl_opts)
-        fb_opts.pop("extractor_args", None)
-        try:
-            final_path, video_title = _attempt_dl(fb_opts)
-        except Exception:
-            raise primary_err
+        final_path, video_title = _attempt_dl(opts_visionos)
+    except Exception as err_visionos:
+        # Strategy 2: If visionos failed (e.g. member/age-restricted), try cookies if available
+        cookies_file, has_login = check_cookies_status()
+        if cookies_file:
+            if progress_cb:
+                progress_cb(5.0, "Mencoba dengan autentikasi cookies...")
+            opts_authed = dict(ydl_opts)
+            opts_authed["cookiefile"] = str(cookies_file.resolve())
+            try:
+                final_path, video_title = _attempt_dl(opts_authed)
+            except Exception:
+                raise err_visionos
+        else:
+            raise err_visionos
 
     if progress_cb:
         progress_cb(100.0, "Unduhan selesai.")

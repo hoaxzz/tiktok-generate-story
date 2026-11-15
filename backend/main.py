@@ -196,6 +196,14 @@ async def api_upload_cookies(file: UploadFile = File(...)):
     }
 
 
+@app.delete("/api/cookies")
+async def api_delete_cookies():
+    cookie_p, _ = check_cookies_status()
+    if cookie_p and cookie_p.exists():
+        cookie_p.unlink(missing_ok=True)
+    return {"status": "ok", "message": "File cookies.txt berhasil dihapus."}
+
+
 @app.get("/api/videos", response_model=List[VideoMetadata])
 async def api_list_videos():
     files = sorted(
