@@ -185,6 +185,27 @@ def check_cookies_status() -> Tuple[Optional[Path], bool]:
         return path, False
 
 
+def get_ytdlp_proxy() -> Optional[str]:
+    env_proxy = os.environ.get("YTDLP_PROXY")
+    if env_proxy:
+        return env_proxy
+    import socket
+    candidates = [
+        ("host.docker.internal", 40000),
+        ("127.0.0.1", 40000),
+        ("172.17.0.1", 40000),
+        ("host.docker.internal", 1080),
+        ("127.0.0.1", 1080),
+    ]
+    for host, port in candidates:
+        try:
+            with socket.create_connection((host, port), timeout=0.2):
+                return f"socks5://{host}:{port}"
+        except Exception:
+            continue
+    return None
+
+
 def download_youtube_video(
     url: str,
     max_height: int = 1080,
@@ -222,6 +243,12 @@ def download_youtube_video(
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
         },
     }
+
+    proxy = get_ytdlp_proxy()
+    if proxy:
+        ydl_opts["proxy"] = proxy
+        if progress_cb:
+            progress_cb(1.5, f"Menggunakan jalur bersih (WARP proxy: {proxy})...")
 
     def _attempt_dl(opts_to_use: dict) -> Tuple[Path, str]:
         with yt_dlp.YoutubeDL(opts_to_use) as ydl:

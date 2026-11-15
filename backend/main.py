@@ -44,7 +44,7 @@ from backend.models import (
     YoutubeDownloadRequest,
 )
 from backend.services.job_manager import job_manager, list_rendered_outputs
-from backend.services.media_utils import check_system_health, check_cookies_status, find_youtube_cookies_file, probe_video, sanitize_filename
+from backend.services.media_utils import check_system_health, check_cookies_status, find_youtube_cookies_file, get_ytdlp_proxy, probe_video, sanitize_filename
 from backend.services.story_splitter import split_story_into_parts
 from backend.services.thumbnail_generator import generate_thumbnail_image
 
@@ -159,6 +159,7 @@ async def api_health():
 @app.get("/api/config")
 async def api_config():
     cookie_path, has_login = check_cookies_status()
+    active_proxy = get_ytdlp_proxy()
     return {
         "voices": [{"id": k, "label": v} for k, v in VOICES.items()],
         "subtitle_styles": [{"id": k, "label": v} for k, v in SUBTITLE_STYLES.items()],
@@ -166,6 +167,8 @@ async def api_config():
         "thumbnail_styles": [{"id": k, "label": v} for k, v in THUMBNAIL_STYLES.items()],
         "cookies_installed": cookie_path is not None,
         "cookies_has_login": has_login,
+        "proxy_active": active_proxy is not None,
+        "proxy_url": active_proxy,
     }
 
 @app.post("/api/cookies/upload")

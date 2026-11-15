@@ -217,14 +217,17 @@
       const badge = $("cookiesStatusBadge");
       const delBtn = $("deleteCookiesBtn");
       if (badge) {
-        if (data.cookies_installed && data.cookies_has_login) {
+        if (data.proxy_active) {
+          badge.innerHTML = '<span class="text-emerald-400 font-semibold">⚡ WARP Proxy Aktif (Bypass Blokir AWS)</span>';
+          delBtn?.classList.add("hidden");
+        } else if (data.cookies_installed && data.cookies_has_login) {
           badge.innerHTML = '<span class="text-emerald-400 font-semibold">✅ Terpasang (Akun Login)</span>';
           delBtn?.classList.remove("hidden");
         } else if (data.cookies_installed) {
           badge.innerHTML = '<span class="text-amber-400 font-medium">⚠️ Terpasang (Tanpa Login)</span>';
           delBtn?.classList.remove("hidden");
         } else {
-          badge.innerHTML = '<span class="text-zinc-500">Tidak Digunakan (Mode VisionOS Buka Langsung)</span>';
+          badge.innerHTML = '<span class="text-zinc-500">Standar VPS (AWS)</span>';
           delBtn?.classList.add("hidden");
         }
       }
