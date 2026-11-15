@@ -3,13 +3,14 @@
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
-# Install FFmpeg, fontconfig, and fonts for ASS subtitles and Pillow thumbnails
+# Install FFmpeg, fontconfig, fonts, and nodejs (for yt-dlp JavaScript challenge solver)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     fontconfig \
     fonts-dejavu-core \
     fonts-freefont-ttf \
     fonts-liberation \
+    nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

@@ -196,9 +196,7 @@ def download_youtube_video(
 
     ydl_opts = {
         "format": (
-            f"bestvideo[height<={max_height}][ext=mp4]+bestaudio[ext=m4a]/"
-            f"bestvideo[height<={max_height}]+bestaudio/"
-            f"best[height<={max_height}]/best"
+            f"bestvideo[height<={max_height}]+bestaudio/best[height<={max_height}]/bestvideo+bestaudio/best"
         ),
         "outtmpl": out_template,
         "merge_output_format": "mp4",
@@ -216,13 +214,6 @@ def download_youtube_video(
         ydl_opts["cookiefile"] = str(cookies_file.resolve())
         if progress_cb:
             progress_cb(2.0, f"Menggunakan autentikasi cookies: {cookies_file.name}...")
-    else:
-        # Fallback client spoofing for VPS IP without cookies
-        ydl_opts["extractor_args"] = {
-            "youtube": {
-                "player_client": ["android", "ios", "mweb", "web"]
-            }
-        }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=True)
