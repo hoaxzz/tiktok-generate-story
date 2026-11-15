@@ -44,7 +44,7 @@ from backend.models import (
     YoutubeDownloadRequest,
 )
 from backend.services.job_manager import job_manager, list_rendered_outputs
-from backend.services.media_utils import check_system_health, find_youtube_cookies_file, probe_video, sanitize_filename
+from backend.services.media_utils import check_system_health, check_cookies_status, find_youtube_cookies_file, probe_video, sanitize_filename
 from backend.services.story_splitter import split_story_into_parts
 from backend.services.thumbnail_generator import generate_thumbnail_image
 
@@ -158,12 +158,14 @@ async def api_health():
 
 @app.get("/api/config")
 async def api_config():
+    cookie_path, has_login = check_cookies_status()
     return {
         "voices": [{"id": k, "label": v} for k, v in VOICES.items()],
         "subtitle_styles": [{"id": k, "label": v} for k, v in SUBTITLE_STYLES.items()],
         "subtitle_fonts": SUBTITLE_FONTS,
         "thumbnail_styles": [{"id": k, "label": v} for k, v in THUMBNAIL_STYLES.items()],
-        "cookies_installed": find_youtube_cookies_file() is not None,
+        "cookies_installed": cookie_path is not None,
+        "cookies_has_login": has_login,
     }
 
 @app.post("/api/cookies/upload")
@@ -176,7 +178,22 @@ async def api_upload_cookies(file: UploadFile = File(...)):
     target_path = UPLOADS_DIR / "cookies.txt"
     async with aiofiles.open(target_path, "wb") as out:
         await out.write(content)
-    return {"status": "ok", "message": f"cookies.txt berhasil disimpan ({len(content)} bytes)."}
+
+    text_content = content.decode("utf-8", errors="ignore")
+    has_youtube = ".youtube.com" in text_content
+    has_login = any(k in text_content for k in ["LOGIN_INFO", "SAPISID", "SSID", "__Secure-3PSID", "SID"])
+
+    return {
+        "status": "ok",
+        "size_bytes": len(content),
+        "has_youtube": has_youtube,
+        "has_login": has_login,
+        "message": (
+            "File cookies.txt tersimpan dan akun login terverifikasi!"
+            if has_login
+            else "File tersimpan, namun TIDAK terdeteksi akun login YouTube (hanya guest). Pastikan login ke akun YouTube di browser sebelum export cookies!"
+        ),
+    }
 
 
 @app.get("/api/videos", response_model=List[VideoMetadata])

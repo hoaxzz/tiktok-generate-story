@@ -140,13 +140,8 @@ class JobManager:
             )
         except Exception as exc:
             raw_err = str(exc)
-            if "Requested format is not available" in raw_err or "Sign in to confirm" in raw_err or "bot" in raw_err.lower():
-                display_msg = (
-                    "YouTube memblokir unduhan di VPS (Bot / Format Block). "
-                    "Solusi: Upload file 'cookies.txt' lewat tombol di tab YouTube atau gunakan tab Upload video langsung."
-                )
-            else:
-                display_msg = f"Gagal mengunduh: {exc}"
+            clean_err = raw_err.replace("ERROR: [youtube] ", "").strip()
+            display_msg = f"Gagal mengunduh: {clean_err}"
 
             self._update(
                 job_id,

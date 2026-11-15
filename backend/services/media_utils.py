@@ -173,6 +173,18 @@ def find_youtube_cookies_file() -> Optional[Path]:
     return None
 
 
+def check_cookies_status() -> Tuple[Optional[Path], bool]:
+    path = find_youtube_cookies_file()
+    if not path or not path.exists():
+        return None, False
+    try:
+        txt = path.read_text(encoding="utf-8", errors="ignore")
+        has_login = any(k in txt for k in ["LOGIN_INFO", "SAPISID", "SSID", "__Secure-3PSID", "SID"])
+        return path, has_login
+    except Exception:
+        return path, False
+
+
 def download_youtube_video(
     url: str,
     max_height: int = 1080,
@@ -203,17 +215,20 @@ def download_youtube_video(
         "noplaylist": True,
         "quiet": True,
         "no_warnings": True,
+        "source_address": "0.0.0.0",
+        "cachedir": False,
         "progress_hooks": [hook],
         "http_headers": {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
         },
     }
 
-    cookies_file = find_youtube_cookies_file()
+    cookies_file, has_login = check_cookies_status()
     if cookies_file:
         ydl_opts["cookiefile"] = str(cookies_file.resolve())
         if progress_cb:
-            progress_cb(2.0, f"Menggunakan autentikasi cookies: {cookies_file.name}...")
+            status_text = "dengan akun terverifikasi" if has_login else "PERINGATAN: tanpa sesi login"
+            progress_cb(2.0, f"Menggunakan cookies ({status_text})...")
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=True)

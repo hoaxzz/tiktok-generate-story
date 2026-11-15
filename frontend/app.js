@@ -216,10 +216,12 @@
       const data = await res.json();
       const badge = $("cookiesStatusBadge");
       if (badge) {
-        if (data.cookies_installed) {
-          badge.innerHTML = '<span class="text-emerald-400 font-semibold">✅ Aktif (cookies.txt)</span>';
+        if (data.cookies_installed && data.cookies_has_login) {
+          badge.innerHTML = '<span class="text-emerald-400 font-semibold">✅ Akun Login Terverifikasi</span>';
+        } else if (data.cookies_installed) {
+          badge.innerHTML = '<span class="text-amber-400 font-medium">⚠️ Terpasang TAPI Tanpa Akun Login (Login dulu di YouTube!)</span>';
         } else {
-          badge.innerHTML = '<span class="text-amber-400">⚠️ Belum Terpasang</span>';
+          badge.innerHTML = '<span class="text-zinc-500">Belum Terpasang</span>';
         }
       }
     } catch {}
@@ -236,7 +238,11 @@
       const res = await rawFetch("/api/cookies/upload", { method: "POST", body: formData });
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || "Gagal mengunggah cookies.");
-      alert("✅ Berhasil! File cookies.txt tersimpan. Sekarang server VPS dapat mengunduh video YouTube.");
+      if (!data.has_login) {
+        alert("⚠️ Perhatian: File cookies yang diunggah TIDAK memiliki sesi login akun YouTube! Di VPS, YouTube akan memblokir unduhan jika diekspor tanpa login akun. Silakan login ke youtube.com di browser, lalu export ulang.");
+      } else {
+        alert("✅ Berhasil! File cookies.txt memiliki akun login YouTube yang valid dan siap digunakan di VPS.");
+      }
       loadCookiesStatus();
     } catch (err) {
       alert(`Gagal mengunggah cookies: ${err.message}`);
