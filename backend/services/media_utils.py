@@ -230,22 +230,42 @@ def download_youtube_video(
             status_text = "dengan akun terverifikasi" if has_login else "PERINGATAN: tanpa sesi login"
             progress_cb(2.0, f"Menggunakan cookies ({status_text})...")
 
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(url, download=True)
-        if not info:
-            raise RuntimeError("yt-dlp gagal mengambil informasi video.")
-        video_title = info.get("title") or "YouTube Video"
-        prepared = Path(ydl.prepare_filename(info))
-        mp4_candidate = prepared.with_suffix(".mp4")
-        if mp4_candidate.exists():
-            final_path = mp4_candidate
-        elif prepared.exists():
-            final_path = prepared
-        else:
-            matches = sorted(UPLOADS_DIR.glob(f"yt_{timestamp}_*"), key=lambda p: p.stat().st_mtime, reverse=True)
-            if not matches:
-                raise FileNotFoundError("File hasil unduhan yt-dlp tidak ditemukan.")
-            final_path = matches[0]
+    ydl_opts["extractor_args"] = {
+        "youtube": {
+            "player_client": ["visionos", "web"]
+        }
+    }
+
+    def _attempt_dl(opts_to_use: dict) -> Tuple[Path, str]:
+        with yt_dlp.YoutubeDL(opts_to_use) as ydl:
+            info = ydl.extract_info(url, download=True)
+            if not info:
+                raise RuntimeError("yt-dlp gagal mengambil informasi video.")
+            video_title = info.get("title") or "YouTube Video"
+            prepared = Path(ydl.prepare_filename(info))
+            mp4_candidate = prepared.with_suffix(".mp4")
+            if mp4_candidate.exists():
+                return mp4_candidate, video_title
+            elif prepared.exists():
+                return prepared, video_title
+            else:
+                matches = sorted(UPLOADS_DIR.glob(f"yt_{timestamp}_*"), key=lambda p: p.stat().st_mtime, reverse=True)
+                if not matches:
+                    raise FileNotFoundError("File hasil unduhan yt-dlp tidak ditemukan.")
+                return matches[0], video_title
+
+    try:
+        final_path, video_title = _attempt_dl(ydl_opts)
+    except Exception as primary_err:
+        if progress_cb:
+            progress_cb(5.0, "Mencoba jalur alternatif YouTube...")
+        # Fallback 1: remove custom player_client
+        fb_opts = dict(ydl_opts)
+        fb_opts.pop("extractor_args", None)
+        try:
+            final_path, video_title = _attempt_dl(fb_opts)
+        except Exception:
+            raise primary_err
 
     if progress_cb:
         progress_cb(100.0, "Unduhan selesai.")
