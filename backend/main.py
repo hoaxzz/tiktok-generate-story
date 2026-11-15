@@ -44,7 +44,7 @@ from backend.models import (
     YoutubeDownloadRequest,
 )
 from backend.services.job_manager import job_manager, list_rendered_outputs
-from backend.services.media_utils import check_system_health, probe_video, sanitize_filename
+from backend.services.media_utils import check_system_health, find_youtube_cookies_file, probe_video, sanitize_filename
 from backend.services.story_splitter import split_story_into_parts
 from backend.services.thumbnail_generator import generate_thumbnail_image
 
@@ -163,7 +163,20 @@ async def api_config():
         "subtitle_styles": [{"id": k, "label": v} for k, v in SUBTITLE_STYLES.items()],
         "subtitle_fonts": SUBTITLE_FONTS,
         "thumbnail_styles": [{"id": k, "label": v} for k, v in THUMBNAIL_STYLES.items()],
+        "cookies_installed": find_youtube_cookies_file() is not None,
     }
+
+@app.post("/api/cookies/upload")
+async def api_upload_cookies(file: UploadFile = File(...)):
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="File tidak valid.")
+    content = await file.read()
+    if len(content) < 10:
+        raise HTTPException(status_code=400, detail="File kosong atau tidak valid.")
+    target_path = UPLOADS_DIR / "cookies.txt"
+    async with aiofiles.open(target_path, "wb") as out:
+        await out.write(content)
+    return {"status": "ok", "message": f"cookies.txt berhasil disimpan ({len(content)} bytes)."}
 
 
 @app.get("/api/videos", response_model=List[VideoMetadata])

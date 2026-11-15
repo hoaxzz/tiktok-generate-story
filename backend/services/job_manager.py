@@ -18,6 +18,7 @@ from backend.models import (
 )
 from backend.services.media_utils import (
     download_youtube_video,
+    find_youtube_cookies_file,
     parse_timestamp,
     probe_video,
     sanitize_filename,
@@ -96,13 +97,19 @@ class JobManager:
         return job_id
 
     async def _run_youtube_job(self, job_id: str, req: YoutubeDownloadRequest) -> None:
+        cookie_file = find_youtube_cookies_file()
+        init_log = (
+            f"Memulai unduhan: {req.url} (Menggunakan auth: {cookie_file.name})"
+            if cookie_file
+            else f"Memulai unduhan: {req.url} (PERINGATAN: cookies.txt tidak terdeteksi di uploads/)"
+        )
         self._update(
             job_id,
             status="running",
             progress=2.0,
             stage="youtube_download",
             message="Menghubungi YouTube via yt-dlp...",
-            log=f"Memulai unduhan YouTube: {req.url}",
+            log=init_log,
         )
         try:
             def on_dl_progress(pct: float, msg: str) -> None:
@@ -133,10 +140,10 @@ class JobManager:
             )
         except Exception as exc:
             raw_err = str(exc)
-            if "Sign in to confirm" in raw_err or "bot" in raw_err.lower():
+            if "Requested format is not available" in raw_err or "Sign in to confirm" in raw_err or "bot" in raw_err.lower():
                 display_msg = (
-                    "YouTube memblokir IP VPS (Bot Check). "
-                    "Solusi: Simpan file 'cookies.txt' di folder uploads/ (atau gunakan fitur Upload video langsung)."
+                    "YouTube memblokir unduhan di VPS (Bot / Format Block). "
+                    "Solusi: Upload file 'cookies.txt' lewat tombol di tab YouTube atau gunakan tab Upload video langsung."
                 )
             else:
                 display_msg = f"Gagal mengunduh: {exc}"

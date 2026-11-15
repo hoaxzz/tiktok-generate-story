@@ -210,6 +210,42 @@
     }
   }
 
+  async function loadCookiesStatus() {
+    try {
+      const res = await rawFetch("/api/config");
+      const data = await res.json();
+      const badge = $("cookiesStatusBadge");
+      if (badge) {
+        if (data.cookies_installed) {
+          badge.innerHTML = '<span class="text-emerald-400 font-semibold">✅ Aktif (cookies.txt)</span>';
+        } else {
+          badge.innerHTML = '<span class="text-amber-400">⚠️ Belum Terpasang</span>';
+        }
+      }
+    } catch {}
+  }
+
+  $("cookiesFileInput")?.addEventListener("change", async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const badge = $("cookiesStatusBadge");
+    if (badge) badge.textContent = "Mengunggah cookies...";
+    const formData = new FormData();
+    formData.append("file", file);
+    try {
+      const res = await rawFetch("/api/cookies/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Gagal mengunggah cookies.");
+      alert("✅ Berhasil! File cookies.txt tersimpan. Sekarang server VPS dapat mengunduh video YouTube.");
+      loadCookiesStatus();
+    } catch (err) {
+      alert(`Gagal mengunggah cookies: ${err.message}`);
+      loadCookiesStatus();
+    } finally {
+      e.target.value = "";
+    }
+  });
+
   // Source Tabs
   function switchSourceTab(target) {
     document.querySelectorAll(".source-tab-btn").forEach((b) => {
@@ -1261,6 +1297,7 @@
     const unlocked = await checkAuthStatus();
     if (unlocked) {
       loadHealth();
+      loadCookiesStatus();
       loadLibrary();
       loadAffiliates();
       loadOutputs();
