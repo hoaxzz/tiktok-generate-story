@@ -49,3 +49,6 @@ outputs/*
 .DS_Store
 Thumbs.db
 desktop.ini
+# Cookies for yt-dlp authentication
+cookies.txt
+*cookies*.txt

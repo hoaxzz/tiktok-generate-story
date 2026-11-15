@@ -1,4 +1,5 @@
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -9,7 +10,7 @@ from typing import Callable, Optional, Tuple
 import edge_tts
 import yt_dlp
 
-from backend.config import UPLOADS_DIR
+from backend.config import BASE_DIR, UPLOADS_DIR
 from backend.models import SystemHealthResponse, VideoMetadata
 
 
@@ -155,6 +156,23 @@ def probe_video(file_path: Path, source_type: str = "upload", title: Optional[st
     )
 
 
+def find_youtube_cookies_file() -> Optional[Path]:
+    cookie_candidates = [
+        UPLOADS_DIR / "cookies.txt",
+        BASE_DIR / "cookies.txt",
+        Path("/app/uploads/cookies.txt"),
+        Path("/app/cookies.txt"),
+    ]
+    env_cookie = os.environ.get("YTDLP_COOKIES_PATH")
+    if env_cookie:
+        cookie_candidates.insert(0, Path(env_cookie))
+
+    for p in cookie_candidates:
+        if p.is_file() and p.stat().st_size > 0:
+            return p
+    return None
+
+
 def download_youtube_video(
     url: str,
     max_height: int = 1080,
@@ -188,7 +206,23 @@ def download_youtube_video(
         "quiet": True,
         "no_warnings": True,
         "progress_hooks": [hook],
+        "http_headers": {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
+        },
     }
+
+    cookies_file = find_youtube_cookies_file()
+    if cookies_file:
+        ydl_opts["cookiefile"] = str(cookies_file.resolve())
+        if progress_cb:
+            progress_cb(2.0, f"Menggunakan autentikasi cookies: {cookies_file.name}...")
+    else:
+        # Fallback client spoofing for VPS IP without cookies
+        ydl_opts["extractor_args"] = {
+            "youtube": {
+                "player_client": ["android", "ios", "mweb", "web"]
+            }
+        }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=True)

@@ -132,13 +132,22 @@ class JobManager:
                 video_metadata=meta,
             )
         except Exception as exc:
+            raw_err = str(exc)
+            if "Sign in to confirm" in raw_err or "bot" in raw_err.lower():
+                display_msg = (
+                    "YouTube memblokir IP VPS (Bot Check). "
+                    "Solusi: Simpan file 'cookies.txt' di folder uploads/ (atau gunakan fitur Upload video langsung)."
+                )
+            else:
+                display_msg = f"Gagal mengunduh: {exc}"
+
             self._update(
                 job_id,
                 status="failed",
                 stage="error",
-                message=f"Gagal mengunduh: {exc}",
+                message=display_msg,
                 log=f"ERROR: {exc}",
-                error=str(exc),
+                error=display_msg,
             )
 
     async def start_render_job(self, req: RenderRequest) -> str:

@@ -17,3 +17,5 @@ uploads/*.mkv
 uploads/*.webm
 uploads/covers/*
 uploads/affiliates/*
+cookies.txt
+*cookies*.txt
