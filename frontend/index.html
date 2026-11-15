@@ -1,0 +1,767 @@
+﻿<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TikTok Story &amp; Satisfying Clipper Studio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            tiktokCyan: '#25F4EE',
+            tiktokPink: '#FE2C55',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #09090b; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+  </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen antialiased selection:bg-tiktokPink/30 selection:text-white">
+  <!-- Top Bar -->
+  <header class="sticky top-0 z-30 border-b border-zinc-800/80 bg-zinc-950/90 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-tiktokCyan via-zinc-900 to-tiktokPink p-[2px] shadow-lg shadow-tiktokPink/10">
+          <div class="w-full h-full bg-zinc-950 rounded-[10px] flex items-center justify-center font-black text-base tracking-tight">
+            <span class="text-tiktokCyan">9</span><span class="text-zinc-400">:</span><span class="text-tiktokPink">16</span>
+          </div>
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold tracking-tight text-white">
+            TikTok Story &amp; Satisfying Clipper Studio
+          </h1>
+          <p class="text-xs text-zinc-400">
+            Auto 9:16 Clipper • Edge-TTS Bahasa Indonesia • Auto-Subtitle .ASS • Thumbnail &amp; Cover Generator
+          </p>
+        </div>
+      </div>
+
+      <div id="healthBadges" class="flex flex-wrap items-center gap-2 text-xs">
+        <span class="px-2.5 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400">
+          Memeriksa sistem...
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- Left Column: Studio Controls -->
+    <div class="lg:col-span-7 space-y-6">
+
+      <!-- MODUL 1: Background Video & Smart Clipper -->
+      <section class="rounded-2xl bg-zinc-900/70 border border-zinc-800 p-5 shadow-xl">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2.5">
+            <span class="w-7 h-7 rounded-lg bg-tiktokCyan/15 text-tiktokCyan font-bold text-xs flex items-center justify-center border border-tiktokCyan/30">1</span>
+            <h2 class="text-base font-semibold text-white">Background Video &amp; Smart Clipper</h2>
+          </div>
+          <span class="text-[11px] px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">
+            Auto Crop 1080×1920 (9:16)
+          </span>
+        </div>
+
+        <!-- Source Tabs -->
+        <div class="grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-zinc-950 border border-zinc-800 mb-4 text-xs font-medium">
+          <button type="button" data-source-tab="upload" class="source-tab-btn py-2 px-3 rounded-lg bg-zinc-800 text-white transition">
+            Upload File (.mp4)
+          </button>
+          <button type="button" data-source-tab="youtube" class="source-tab-btn py-2 px-3 rounded-lg text-zinc-400 hover:text-white transition">
+            URL YouTube (yt-dlp)
+          </button>
+          <button type="button" data-source-tab="library" class="source-tab-btn py-2 px-3 rounded-lg text-zinc-400 hover:text-white transition">
+            Library (<span id="libraryCount">0</span>)
+          </button>
+        </div>
+
+        <!-- Tab: Upload -->
+        <div id="tabUpload" class="space-y-3">
+          <label for="videoFileInput" class="flex flex-col items-center justify-center border-2 border-dashed border-zinc-700 hover:border-tiktokCyan/60 rounded-xl p-6 cursor-pointer bg-zinc-950/50 transition group">
+            <svg class="w-8 h-8 text-zinc-500 group-hover:text-tiktokCyan mb-2 transition" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+            </svg>
+            <span class="text-sm font-medium text-zinc-200">Klik atau pilih video satisfying (.mp4, .mov, .mkv, .webm)</span>
+            <span class="text-xs text-zinc-500 mt-1">Misal: Minecraft parkour, GTA ramp, slime/soap cutting, hydraulic press</span>
+            <input id="videoFileInput" type="file" accept=".mp4,.mov,.mkv,.webm,.m4v,.avi" class="hidden" />
+          </label>
+          <div id="uploadStatus" class="hidden text-xs text-tiktokCyan bg-tiktokCyan/10 border border-tiktokCyan/20 rounded-lg px-3 py-2"></div>
+        </div>
+
+        <!-- Tab: YouTube -->
+        <div id="tabYoutube" class="hidden space-y-3">
+          <div class="flex flex-col sm:flex-row gap-2">
+            <input id="youtubeUrlInput" type="url" placeholder="https://www.youtube.com/watch?v=..."
+              class="flex-1 rounded-xl bg-zinc-950 border border-zinc-800 px-3.5 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-tiktokCyan" />
+            <select id="youtubeMaxHeight" class="rounded-xl bg-zinc-950 border border-zinc-800 px-3 py-2.5 text-sm text-zinc-200 focus:outline-none focus:border-tiktokCyan">
+              <option value="1080" selected>Max 1080p</option>
+              <option value="720">Max 720p (Cepat)</option>
+            </select>
+            <button id="youtubeDownloadBtn" type="button"
+              class="px-4 py-2.5 rounded-xl bg-tiktokCyan text-zinc-950 font-semibold text-sm hover:opacity-90 transition whitespace-nowrap">
+              Unduh Video
+            </button>
+          </div>
+          <div id="youtubeProgressBox" class="hidden rounded-xl bg-zinc-950 border border-zinc-800 p-3 space-y-2">
+            <div class="flex justify-between text-xs">
+              <span id="youtubeProgressText" class="text-zinc-300">Mengunduh...</span>
+              <span id="youtubeProgressPct" class="text-tiktokCyan font-mono">0%</span>
+            </div>
+            <div class="w-full h-2 rounded-full bg-zinc-800 overflow-hidden">
+              <div id="youtubeProgressBar" class="h-full bg-tiktokCyan transition-all duration-200" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Library -->
+        <div id="tabLibrary" class="hidden space-y-2 max-h-60 overflow-y-auto pr-1">
+          <div id="libraryList" class="space-y-2 text-xs text-zinc-400">
+            Memuat daftar video...
+          </div>
+        </div>
+
+        <!-- Video Background Terpilih & Pemilih Koleksi Dropdown -->
+        <div id="selectedVideoBox" class="mt-4 rounded-xl bg-zinc-950 border border-zinc-800 p-4 space-y-3">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <div class="text-[11px] uppercase tracking-wider text-zinc-300 font-bold">Pilih Video Background Aktif</div>
+            </div>
+            <span id="libraryVideosBadge" class="text-[11px] px-2.5 py-0.5 rounded-full bg-tiktokCyan/10 text-tiktokCyan border border-tiktokCyan/30 font-medium">
+              0 Video Tersimpan
+            </span>
+          </div>
+
+          <div>
+            <label for="videoSelectDropdown" class="block text-xs text-zinc-400 mb-1 font-medium">Pilih langsung dari koleksi video yang sudah diunduh:</label>
+            <select id="videoSelectDropdown" class="w-full rounded-xl bg-zinc-900 border border-zinc-700/80 px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-tiktokCyan transition font-mono">
+              <option value="">-- Belum ada video, silakan upload atau unduh dari YouTube --</option>
+            </select>
+          </div>
+
+          <!-- Video Details Card -->
+          <div id="selectedVideoDetailCard" class="hidden rounded-xl bg-zinc-900/60 border border-zinc-800/80 p-3 flex flex-wrap items-center justify-between gap-3">
+            <div class="min-w-0 flex-1">
+              <div id="selectedVideoTitle" class="text-xs font-semibold text-white truncate"></div>
+              <div id="selectedVideoMeta" class="text-[11px] text-zinc-400 mt-0.5"></div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button id="previewSourceBtn" type="button" class="text-xs px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 transition font-medium flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-tiktokCyan" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11v11.78a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+                <span>Putar Sumber</span>
+              </button>
+              <button id="openLibraryTabBtn" type="button" class="text-xs px-2.5 py-1.5 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 transition">
+                📂 Buka Tab Library
+              </button>
+            </div>
+          </div>
+
+          <div class="text-[11px] text-zinc-400 bg-zinc-900/40 rounded-lg p-2.5 flex items-start gap-2 border border-zinc-800/50">
+            <span class="text-tiktokCyan">💡</span>
+            <span>Semua video yang Anda upload atau download otomatis disimpan ke Library dan tidak akan terhapus saat menambah video baru. Anda bebas memilih video mana saja kapan pun dari menu dropdown di atas.</span>
+          </div>
+        </div>
+
+        <!-- Clipping Mode -->
+        <div class="mt-5 pt-4 border-t border-zinc-800/80 space-y-3">
+          <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400">Mode Pemotongan Klip</label>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+            <label class="cursor-pointer">
+              <input type="radio" name="clipMode" value="auto_random" checked class="peer sr-only" />
+              <div class="p-3 rounded-xl border border-zinc-800 bg-zinc-950/70 peer-checked:border-tiktokCyan peer-checked:bg-tiktokCyan/10 transition h-full">
+                <div class="font-semibold text-white">Auto-Random</div>
+                <div class="text-zinc-400 mt-0.5">Ambil klip acak otomatis sesuai durasi narasi cerita.</div>
+              </div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="clipMode" value="auto_part" class="peer sr-only" />
+              <div class="p-3 rounded-xl border border-zinc-800 bg-zinc-950/70 peer-checked:border-tiktokCyan peer-checked:bg-tiktokCyan/10 transition h-full">
+                <div class="font-semibold text-white">Auto-Part</div>
+                <div class="text-zinc-400 mt-0.5">Potong berurutan per bagian (45–60 detik / per part).</div>
+              </div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="clipMode" value="manual" class="peer sr-only" />
+              <div class="p-3 rounded-xl border border-zinc-800 bg-zinc-950/70 peer-checked:border-tiktokCyan peer-checked:bg-tiktokCyan/10 transition h-full">
+                <div class="font-semibold text-white">Manual Trim</div>
+                <div class="text-zinc-400 mt-0.5">Tentukan Start Time dan End Time secara manual.</div>
+              </div>
+            </label>
+          </div>
+
+          <!-- Manual Trim Inputs -->
+          <div id="manualTrimInputs" class="hidden grid grid-cols-2 gap-3 pt-1">
+            <div>
+              <label class="block text-xs text-zinc-400 mb-1">Start Time (HH:MM:SS / detik)</label>
+              <input id="startTimeInput" type="text" value="00:00:00" placeholder="00:00:10"
+                class="w-full rounded-xl bg-zinc-950 border border-zinc-800 px-3 py-2 text-sm text-white focus:outline-none focus:border-tiktokCyan" />
+            </div>
+            <div>
+              <label class="block text-xs text-zinc-400 mb-1">End Time (HH:MM:SS / detik)</label>
+              <input id="endTimeInput" type="text" value="00:01:00" placeholder="00:01:05"
+                class="w-full rounded-xl bg-zinc-950 border border-zinc-800 px-3 py-2 text-sm text-white focus:outline-none focus:border-tiktokCyan" />
+            </div>
+          </div>
+
+          <!-- Auto-Part Duration Input -->
+          <div id="autoPartInputs" class="hidden pt-1">
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="text-zinc-400">Durasi Per Part (saat mode Auto-Part)</span>
+              <span id="partDurationVal" class="font-mono text-tiktokCyan font-semibold">50 detik</span>
+            </div>
+            <input id="partDurationInput" type="range" min="15" max="120" step="5" value="50"
+              class="w-full accent-tiktokCyan cursor-pointer" />
+          </div>
+
+          <!-- Anti-Copyright Filter -->
+          <label class="flex items-start gap-3 p-3 rounded-xl bg-zinc-950/70 border border-zinc-800 cursor-pointer hover:border-zinc-700 transition">
+            <input id="antiCopyrightCheckbox" type="checkbox" class="mt-0.5 w-4 h-4 rounded accent-tiktokPink" />
+            <div class="text-xs">
+              <div class="font-semibold text-white">Aktifkan Filter Anti-Copyright / Anti-Duplicate</div>
+              <div class="text-zinc-400 mt-0.5">
+                Menambahkan Horizontal Flip (<code class="text-zinc-300">hflip</code>), kecepatan <code class="text-zinc-300">1.05x</code>, serta boost saturasi &amp; kontras ringan.
+              </div>
+            </div>
+          </label>
+        </div>
+      </section>
+
+      <!-- MODUL 2: Cerita & Voiceover (TTS + Auto-Subtitle) -->
+      <section class="rounded-2xl bg-zinc-900/70 border border-zinc-800 p-5 shadow-xl">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <div class="flex items-center gap-2.5">
+            <span class="w-7 h-7 rounded-lg bg-tiktokPink/15 text-tiktokPink font-bold text-xs flex items-center justify-center border border-tiktokPink/30">2</span>
+            <h2 class="text-base font-semibold text-white">Cerita &amp; Voiceover (TTS + Auto-Subtitle)</h2>
+          </div>
+          <label class="flex items-center gap-2 text-xs cursor-pointer select-none">
+            <input id="includeTtsCheckbox" type="checkbox" checked class="w-4 h-4 accent-tiktokPink rounded" />
+            <span class="text-zinc-200 font-medium">Sertakan Narasi &amp; Subtitle</span>
+          </label>
+        </div>
+
+        <div id="ttsModuleBody" class="space-y-4">
+          <!-- Preset Buttons -->
+          <div class="flex items-center justify-between flex-wrap gap-2 text-xs">
+            <span class="text-zinc-400">Contoh Cerita Viral:</span>
+            <div class="flex gap-1.5">
+              <button type="button" data-preset="horor" class="preset-btn px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition">Horor Kantor</button>
+              <button type="button" data-preset="fakta" class="preset-btn px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition">Fakta Gurita</button>
+              <button type="button" data-preset="curhat" class="preset-btn px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition">Curhat Hidup</button>
+            </div>
+          </div>
+
+          <!-- Story Textarea -->
+          <div>
+            <textarea id="storyInput" rows="7" placeholder="Tulis atau paste cerita Anda di sini...&#10;Contoh: Malam itu hujan turun sangat deras ketika aku terpaksa lembur sendirian di lantai empat kantor lama..."
+              class="w-full rounded-xl bg-zinc-950 border border-zinc-800 p-3.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-tiktokPink transition font-sans leading-relaxed"></textarea>
+            <div class="flex flex-wrap items-center justify-between text-xs text-zinc-400 mt-1.5 px-1">
+              <div class="flex items-center gap-3">
+                <span>Kata: <strong id="wordCountDisplay" class="text-tiktokPink font-semibold">0</strong></span>
+                <span>Karakter: <strong id="charCountDisplay" class="text-zinc-200">0</strong></span>
+                <span>Est. Durasi TTS: <strong id="estDurationDisplay" class="text-tiktokCyan font-semibold">0 detik</strong></span>
+              </div>
+              <button id="previewSplitBtn" type="button" class="text-tiktokPink hover:underline">
+                Lihat Pembagian Part &gt;
+              </button>
+            </div>
+          </div>
+
+          <!-- Multi-Part Splitting Settings -->
+          <div class="p-4 rounded-xl bg-zinc-950/70 border border-zinc-800 space-y-3">
+            <div class="flex items-center justify-between">
+              <label class="flex items-center gap-2 cursor-pointer text-xs">
+                <input id="autoSplitCheckbox" type="checkbox" checked class="w-4 h-4 accent-tiktokPink rounded" />
+                <span class="font-semibold text-white">Auto-Split Naskah Jadi Multi-Part (Tiap 45–60 Detik)</span>
+              </label>
+              <span id="targetPartsEstimate" class="text-[11px] px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 font-mono">1 Part</span>
+            </div>
+
+            <div id="splitOptions" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-1">
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span class="text-zinc-400">Target Kata Per Part</span>
+                  <span id="maxWordsVal" class="font-mono text-tiktokPink font-semibold">120 kata (~50s)</span>
+                </div>
+                <input id="maxWordsInput" type="range" min="60" max="250" step="10" value="120"
+                  class="w-full accent-tiktokPink cursor-pointer" />
+              </div>
+              <div>
+                <label class="block text-zinc-400 mb-1">Template CTA Lanjut Part</label>
+                <input id="ctaTemplateInput" type="text" value="Cek profil dan follow untuk lanjut ke Part {next_part}!"
+                  class="w-full rounded-lg bg-zinc-900 border border-zinc-800 px-3 py-1.5 text-xs text-white focus:outline-none focus:border-tiktokPink" />
+              </div>
+            </div>
+
+            <!-- Split Preview Drawer -->
+            <div id="splitPreviewBox" class="hidden pt-2 border-t border-zinc-800 space-y-2">
+              <div class="text-xs font-semibold text-zinc-300 flex items-center justify-between">
+                <span>Daftar Bagian (Part Breakdown)</span>
+                <span id="splitSummaryText" class="text-zinc-500 font-normal"></span>
+              </div>
+              <div id="partsContainer" class="space-y-2 max-h-48 overflow-y-auto pr-1 text-xs"></div>
+            </div>
+          </div>
+
+          <!-- TTS Voice & Subtitle Customizer -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+            <!-- Voice Selection -->
+            <div>
+              <label class="block text-zinc-400 mb-1">Pilihan Suara (Edge-TTS Indonesia)</label>
+              <select id="voiceSelect" class="w-full rounded-xl bg-zinc-950 border border-zinc-800 px-3 py-2.5 text-xs text-white focus:outline-none focus:border-tiktokPink">
+                <option value="id-ID-GadisNeural" selected>Gadis (Wanita Indonesia - Natural)</option>
+                <option value="id-ID-ArdiNeural">Ardi (Pria Indonesia - Natural)</option>
+              </select>
+            </div>
+
+            <!-- TTS Speed -->
+            <div>
+              <div class="flex justify-between mb-1">
+                <span class="text-zinc-400">Kecepatan Bicara (TTS Rate)</span>
+                <span id="ttsRateVal" class="font-mono text-tiktokPink font-semibold">+10% (Rekomendasi TikTok)</span>
+              </div>
+              <input id="ttsRateInput" type="range" min="-20" max="40" step="5" value="10"
+                class="w-full accent-tiktokPink cursor-pointer mt-1" />
+            </div>
+
+            <!-- Subtitle Style -->
+            <div>
+              <label class="block text-zinc-400 mb-1">Gaya Subtitle Otomatis</label>
+              <select id="subtitleStyleSelect" class="w-full rounded-xl bg-zinc-950 border border-zinc-800 px-3 py-2 text-xs text-white focus:outline-none focus:border-tiktokPink">
+                <option value="karaoke_highlight" selected>Karaoke Kuning-Putih (Sorot Kata Aktif)</option>
+                <option value="yellow_bold">Kuning Tebal Klasik TikTok</option>
+                <option value="white_bold">Putih Tebal Outline Hitam</option>
+              </select>
+            </div>
+
+            <!-- Font & Words per Cue -->
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-zinc-400 mb-1">Font Subtitle</label>
+                <select id="subtitleFontSelect" class="w-full rounded-xl bg-zinc-950 border border-zinc-800 px-2.5 py-2 text-xs text-white focus:outline-none focus:border-tiktokPink">
+                  <option value="Arial" selected>Arial</option>
+                  <option value="Impact">Impact</option>
+                  <option value="Segoe UI">Segoe UI</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-zinc-400 mb-1">Ukuran Font</label>
+                <select id="subtitleSizeSelect" class="w-full rounded-xl bg-zinc-950 border border-zinc-800 px-2.5 py-2 text-xs text-white focus:outline-none focus:border-tiktokPink">
+                  <option value="54">54 (Kecil)</option>
+                  <option value="62" selected>62 (Pas)</option>
+                  <option value="72">72 (Besar)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="sm:col-span-2">
+              <div class="flex justify-between mb-1">
+                <span class="text-zinc-400">Jumlah Kata Per Baris Subtitle (Cue Split)</span>
+                <span id="wordsPerCueVal" class="font-mono text-zinc-300 font-semibold">4 kata per tayangan</span>
+              </div>
+              <input id="wordsPerCueInput" type="range" min="1" max="8" step="1" value="4"
+                class="w-full accent-tiktokPink cursor-pointer" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MODUL 3: Thumbnail & Sampul Cover Video (TikTok & YouTube Shorts) -->
+      <section class="rounded-2xl bg-zinc-900/70 border border-zinc-800 p-5 shadow-xl space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2.5">
+            <span class="w-7 h-7 rounded-lg bg-amber-500/15 text-amber-400 font-bold text-xs flex items-center justify-center border border-amber-500/30">3</span>
+            <div>
+              <h2 class="text-base font-semibold text-white">Thumbnail &amp; Sampul Video (TikTok &amp; Shorts)</h2>
+              <p class="text-xs text-zinc-400">Buat sampul viral mencolok untuk cover TikTok / YouTube Shorts (9:16)</p>
+            </div>
+          </div>
+          <label class="flex items-center gap-2 text-xs cursor-pointer select-none">
+            <input id="thumbEnabledCheckbox" type="checkbox" checked class="w-4 h-4 accent-amber-400 rounded" />
+            <span class="text-zinc-200 font-medium">Aktifkan Sampul</span>
+          </label>
+        </div>
+
+        <div id="thumbControlsBox" class="grid grid-cols-1 md:grid-cols-12 gap-5 pt-1">
+          <!-- Left: Settings -->
+          <div class="md:col-span-7 space-y-3.5 text-xs">
+            <div>
+              <label class="block text-zinc-300 font-medium mb-1">Judul Utama Sampul (Headline Hook)</label>
+              <input id="thumbTitleInput" type="text" value="Part {part} | Kisah Nyata..." placeholder="PART 1: JANGAN SENDIRIAN!"
+                class="w-full rounded-xl bg-zinc-950 border border-zinc-800 px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400" />
+              <div class="text-[11px] text-zinc-500 mt-1">Gunakan <code class="text-zinc-300 font-mono">{part}</code> untuk nomor part dan <code class="text-zinc-300 font-mono">{total}</code> untuk total part.</div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-zinc-400 mb-1 font-medium">Tagline / Badge Sampul</label>
+                <input id="thumbSubtitleInput" type="text" value="KISAH NYATA" placeholder="PART 1 / VIRAL / FAKTA UNIK"
+                  class="w-full rounded-xl bg-zinc-950 border border-zinc-800 px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-400" />
+              </div>
+              <div>
+                <label class="block text-zinc-400 mb-1 font-medium">Gaya Desain (Preset)</label>
+                <select id="thumbStyleSelect" class="w-full rounded-xl bg-zinc-950 border border-zinc-800 px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-amber-400">
+                  <option value="tiktok_yellow" selected>TikTok Viral Kuning (Kuning + Teks Hitam)</option>
+                  <option value="red_warning">Peringatan Merah (Banner Merah + Putih)</option>
+                  <option value="cyan_neon">Cyber Neon Cyan (Aksen Neon TikTok Cyan)</option>
+                  <option value="clean_white">Putih Tebal Minimalis (Outline Hitam)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Background Source for Cover -->
+            <div class="p-3 rounded-xl bg-zinc-950/70 border border-zinc-800 space-y-2">
+              <label class="block font-semibold text-zinc-300 uppercase tracking-wider text-[11px]">Sumber Gambar Latar Sampul</label>
+              <div class="space-y-1.5">
+                <label class="flex items-center gap-2 cursor-pointer text-zinc-300">
+                  <input type="radio" name="thumbSourceRadio" value="video_frame" checked class="accent-tiktokCyan" />
+                  <span>Ambil frame dari video background (detik ke- <input id="thumbFrameTimeInput" type="number" min="0" max="999" step="0.5" value="2.0" class="w-14 px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-700 text-center text-white" />)</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer text-zinc-300">
+                  <input type="radio" name="thumbSourceRadio" value="custom_image" class="accent-tiktokCyan" />
+                  <span>Upload gambar sampul kustom (.jpg, .png)</span>
+                </label>
+                <div id="thumbCustomUploadBox" class="hidden pt-1.5 pl-6">
+                  <input id="thumbCustomFileInput" type="file" accept=".jpg,.jpeg,.png,.webp" class="text-xs text-zinc-400 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:bg-zinc-800 file:text-zinc-200 file:text-xs hover:file:bg-zinc-700 cursor-pointer" />
+                  <span id="thumbCustomUploadStatus" class="text-[11px] text-zinc-400 block mt-1"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- TikTok Intro Cover Option -->
+            <label class="flex items-start gap-2.5 p-3 rounded-xl bg-zinc-950/70 border border-zinc-800 cursor-pointer hover:border-zinc-700 transition">
+              <input id="insertCoverIntroCheckbox" type="checkbox" class="mt-0.5 w-4 h-4 rounded accent-amber-400" />
+              <div>
+                <div class="font-semibold text-white">Sisipkan Sampul di Detik Pertama Video (0.8 detik)</div>
+                <div class="text-zinc-400 text-[11px] mt-0.5">
+                  Frame awal video akan otomatis menampilkan sampul ini sehingga saat diupload ke TikTok atau YouTube Shorts, cover judul langsung terpilih secara instan.
+                </div>
+              </div>
+            </label>
+
+            <!-- Buttons -->
+            <div class="flex flex-wrap gap-2 pt-1">
+              <button id="generateThumbBtn" type="button"
+                class="flex-1 py-2.5 px-4 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-medium text-xs transition flex items-center justify-center gap-1.5">
+                <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                <span>Perbarui Preview Sampul</span>
+              </button>
+              <a id="downloadThumbDirectBtn" href="#" download="tiktok_cover.jpg"
+                class="hidden py-2.5 px-4 rounded-xl bg-amber-500/15 text-amber-400 hover:bg-amber-500/25 border border-amber-500/30 font-semibold text-xs transition flex items-center justify-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                <span>Unduh Sampul (.JPG)</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Right: Live 9:16 Mini Preview -->
+          <div class="md:col-span-5 flex flex-col items-center justify-center">
+            <div class="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 mb-2">Live Preview Sampul (9:16)</div>
+            <div id="thumbPreviewContainer" class="w-full max-w-[210px] aspect-[9/16] rounded-2xl bg-zinc-950 border border-zinc-800 overflow-hidden relative shadow-2xl flex items-center justify-center">
+              <img id="thumbPreviewImg" src="" alt="Preview Sampul" class="hidden w-full h-full object-cover" />
+              <!-- Mock preview if no image generated yet -->
+              <div id="thumbMockPreview" class="absolute inset-0 p-3 flex flex-col items-center justify-between text-center select-none bg-gradient-to-b from-zinc-900 via-zinc-950 to-zinc-900">
+                <div class="w-full pt-4">
+                  <span id="mockBadge" class="inline-block px-3 py-1 rounded-full text-[10px] font-bold bg-amber-400 text-zinc-950 uppercase tracking-wide">
+                    KISAH NYATA
+                  </span>
+                </div>
+                <div class="space-y-1.5 my-auto w-full px-1">
+                  <div id="mockTitle1" class="px-2 py-1 rounded bg-amber-400 text-zinc-950 font-black text-xs tracking-tight shadow">
+                    PART 1 | KISAH NYATA
+                  </div>
+                </div>
+                <div class="w-full pb-3">
+                  <span class="inline-block px-2.5 py-0.5 rounded-full text-[9px] bg-black/60 text-zinc-300 font-medium">
+                    SWIPE UNTUK LANJUTAN ▶
+                  </span>
+                </div>
+              </div>
+            </div>
+            <span class="text-[11px] text-zinc-500 mt-2 text-center">Ukuran asli otomatis 1080×1920 (Ultra HD)</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- MODUL 4: Sisipan Video Affiliate / Promosi Produk -->
+      <section class="rounded-2xl bg-zinc-900/70 border border-zinc-800 p-5 shadow-xl space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2.5">
+            <span class="w-7 h-7 rounded-lg bg-purple-500/15 text-purple-400 font-bold text-xs flex items-center justify-center border border-purple-500/30">4</span>
+            <div>
+              <h2 class="text-base font-semibold text-white">Video Affiliate / Sisipan Produk</h2>
+              <p class="text-xs text-zinc-400">Masukkan video produk affiliate ke dalam video utama (awal, tengah, akhir, atau PiP)</p>
+            </div>
+          </div>
+          <label class="flex items-center gap-2 text-xs cursor-pointer select-none">
+            <input id="affiliateEnabledCheckbox" type="checkbox" class="w-4 h-4 accent-purple-400 rounded" />
+            <span class="text-zinc-200 font-medium">Sertakan Video Affiliate</span>
+          </label>
+        </div>
+
+        <div id="affiliateControlsBox" class="opacity-45 pointer-events-none space-y-4 text-xs transition-opacity">
+          <!-- Upload & Library Selector -->
+          <div class="rounded-xl bg-zinc-950 border border-zinc-800 p-4 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="text-[11px] uppercase tracking-wider text-zinc-300 font-bold">Koleksi Video Affiliate</div>
+              <div class="flex items-center gap-2">
+                <span id="affiliateCountBadge" class="text-[11px] px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/30 font-medium">
+                  0 Video
+                </span>
+                <label for="affiliateFileInput" class="cursor-pointer px-3 py-1.5 rounded-lg bg-purple-500 hover:bg-purple-400 text-zinc-950 font-semibold transition flex items-center gap-1.5">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                  <span>Upload Video Affiliate</span>
+                  <input id="affiliateFileInput" type="file" accept=".mp4,.mov,.mkv,.webm,.m4v,.avi" class="hidden" />
+                </label>
+              </div>
+            </div>
+
+            <div id="affiliateUploadStatus" class="hidden text-xs text-purple-300 bg-purple-500/10 border border-purple-500/20 rounded-lg px-3 py-2"></div>
+
+            <div class="flex flex-col sm:flex-row gap-2">
+              <select id="affiliateSelectDropdown" class="flex-1 rounded-xl bg-zinc-900 border border-zinc-700/80 px-3 py-2.5 text-xs text-white focus:outline-none focus:border-purple-400 font-mono">
+                <option value="">-- Belum ada video affiliate, silakan upload --</option>
+              </select>
+              <div class="flex items-center gap-1.5 shrink-0">
+                <button id="previewAffiliateBtn" type="button" class="px-3 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-medium transition disabled:opacity-40" disabled>
+                  Putar
+                </button>
+                <button id="deleteAffiliateBtn" type="button" class="px-3 py-2.5 rounded-xl bg-zinc-800 hover:bg-red-500/20 hover:text-red-400 text-zinc-400 font-medium transition disabled:opacity-40" disabled>
+                  Hapus
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Placement Mode -->
+          <div class="space-y-2">
+            <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400">Posisi Video Affiliate di Dalam Video</label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+              <label class="cursor-pointer">
+                <input type="radio" name="affiliatePlacement" value="end" checked class="peer sr-only" />
+                <div class="p-3 rounded-xl border border-zinc-800 bg-zinc-950/70 peer-checked:border-purple-400 peer-checked:bg-purple-500/10 transition h-full">
+                  <div class="font-semibold text-white">Akhir Video</div>
+                  <div class="text-zinc-400 mt-0.5 text-[11px]">Muncul setelah cerita selesai (CTA Keranjang).</div>
+                </div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="affiliatePlacement" value="start" class="peer sr-only" />
+                <div class="p-3 rounded-xl border border-zinc-800 bg-zinc-950/70 peer-checked:border-purple-400 peer-checked:bg-purple-500/10 transition h-full">
+                  <div class="font-semibold text-white">Awal Video</div>
+                  <div class="text-zinc-400 mt-0.5 text-[11px]">Hook produk dulu, lalu lanjut cerita.</div>
+                </div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="affiliatePlacement" value="middle" class="peer sr-only" />
+                <div class="p-3 rounded-xl border border-zinc-800 bg-zinc-950/70 peer-checked:border-purple-400 peer-checked:bg-purple-500/10 transition h-full">
+                  <div class="font-semibold text-white">Tengah Video</div>
+                  <div class="text-zinc-400 mt-0.5 text-[11px]">Sisipan jeda di pertengahan cerita.</div>
+                </div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="affiliatePlacement" value="pip" class="peer sr-only" />
+                <div class="p-3 rounded-xl border border-zinc-800 bg-zinc-950/70 peer-checked:border-purple-400 peer-checked:bg-purple-500/10 transition h-full">
+                  <div class="font-semibold text-white">Layar Kecil (PiP)</div>
+                  <div class="text-zinc-400 mt-0.5 text-[11px]">Kotak mengambang di pojok atas kanan.</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Fit Mode, Part Scope, Audio Volume -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-zinc-400 mb-1 font-medium">Mode Tampilan Layar Affiliate</label>
+              <select id="affiliateFitModeSelect" class="w-full rounded-xl bg-zinc-950 border border-zinc-800 px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-purple-400">
+                <option value="fit_blur" selected>Fit Utuh + Latar Blur (Produk Tidak Terpotong)</option>
+                <option value="crop">Crop Penuh 9:16 (Memenuhi Layar)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-zinc-400 mb-1 font-medium">Terapkan Pada Part (Multi-Part)</label>
+              <select id="affiliateApplyPartsSelect" class="w-full rounded-xl bg-zinc-950 border border-zinc-800 px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-purple-400">
+                <option value="all" selected>Semua Part</option>
+                <option value="last">Part Terakhir Saja</option>
+                <option value="first">Part Pertama Saja</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Trim, PiP Start, Volume, CTA Badge -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-zinc-400 mb-1">Potong Mulai (detik / HH:MM:SS)</label>
+              <input id="affiliateStartTimeInput" type="text" value="00:00:00" placeholder="00:00:00"
+                class="w-full rounded-xl bg-zinc-950 border border-zinc-800 px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-400" />
+            </div>
+            <div>
+              <label class="block text-zinc-400 mb-1">Potong Selesai (kosong = penuh)</label>
+              <input id="affiliateEndTimeInput" type="text" value="" placeholder="Contoh: 10 atau 00:00:10"
+                class="w-full rounded-xl bg-zinc-950 border border-zinc-800 px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-400" />
+            </div>
+            <div id="affiliatePipStartBox" class="hidden">
+              <label class="block text-zinc-400 mb-1">Muncul di Detik ke- (Mode PiP)</label>
+              <input id="affiliatePipStartInput" type="number" min="0" max="600" step="0.5" value="3.0"
+                class="w-full rounded-xl bg-zinc-950 border border-zinc-800 px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-400" />
+            </div>
+            <div id="affiliateVolumeBox">
+              <div class="flex justify-between mb-1">
+                <span class="text-zinc-400">Volume Video Affiliate</span>
+                <span id="affiliateVolumeVal" class="font-mono text-purple-300 font-semibold">100%</span>
+              </div>
+              <input id="affiliateVolumeInput" type="range" min="0" max="150" step="5" value="100"
+                class="w-full accent-purple-400 cursor-pointer mt-1.5" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-zinc-400 mb-1 font-medium">Teks Stiker CTA di Video Affiliate (Opsional)</label>
+            <input id="affiliateCtaInput" type="text" value="" placeholder="Contoh: Cek Keranjang Kuning Sekarang!"
+              class="w-full rounded-xl bg-zinc-950 border border-zinc-800 px-3.5 py-2 text-xs text-white focus:outline-none focus:border-purple-400" />
+          </div>
+        </div>
+      </section>
+
+      <!-- MODUL 5: Audio Mixing, Hook & Rendering -->
+      <section class="rounded-2xl bg-zinc-900/70 border border-zinc-800 p-5 shadow-xl space-y-4">
+        <div class="flex items-center gap-2.5">
+          <span class="w-7 h-7 rounded-lg bg-emerald-500/15 text-emerald-400 font-bold text-xs flex items-center justify-center border border-emerald-500/30">5</span>
+          <h2 class="text-base font-semibold text-white">Audio Mixing, Hook &amp; Render Akhir</h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+          <div>
+            <label class="block text-zinc-400 mb-1">Nama Project / File Output</label>
+            <input id="projectNameInput" type="text" value="tiktok_story" placeholder="kisah_malam_jumat"
+              class="w-full rounded-xl bg-zinc-950 border border-zinc-800 px-3 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-400" />
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="flex items-center gap-2 cursor-pointer select-none">
+                <input id="bgAudioEnabledCheckbox" type="checkbox" checked class="w-4 h-4 accent-emerald-400 rounded" />
+                <span class="text-zinc-200 font-medium">Suara Video Background</span>
+              </label>
+              <span id="bgVolumeVal" class="font-mono text-emerald-400 font-semibold">ON • 20%</span>
+            </div>
+            <input id="bgVolumeInput" type="range" min="0" max="100" step="5" value="20"
+              class="w-full accent-emerald-400 cursor-pointer mt-1.5 disabled:opacity-35 disabled:cursor-not-allowed" />
+            <div class="flex justify-between text-[11px] text-zinc-500 mt-0.5">
+              <span id="bgAudioHint">Rekomendasi: 15%–25% (ASMR)</span>
+              <span>Suara TTS: 100%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hook Banner -->
+        <div class="rounded-xl bg-zinc-950/70 border border-zinc-800 p-3.5 space-y-3 text-xs">
+          <label class="flex items-center gap-2.5 cursor-pointer">
+            <input id="hookEnabledCheckbox" type="checkbox" checked class="w-4 h-4 accent-emerald-400 rounded" />
+            <span class="font-semibold text-white">Tampilkan Teks Header / Hook Statis di Atas Video</span>
+          </label>
+          <div id="hookOptions" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="sm:col-span-2">
+              <label class="block text-zinc-400 mb-1">Teks Hook (gunakan <code class="text-zinc-300">{part}</code> untuk nomor part)</label>
+              <input id="hookTextInput" type="text" value="Part {part} | Kisah Nyata..."
+                class="w-full rounded-lg bg-zinc-900 border border-zinc-800 px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-400" />
+            </div>
+            <div>
+              <div class="flex justify-between mb-1">
+                <span class="text-zinc-400">Durasi Hook</span>
+                <span id="hookDurationVal" class="font-mono text-white">4 detik</span>
+              </div>
+              <input id="hookDurationInput" type="range" min="2" max="7" step="1" value="4"
+                class="w-full accent-emerald-400 cursor-pointer mt-2" />
+            </div>
+          </div>
+        </div>
+
+        <button id="renderBtn" type="button"
+          class="w-full py-3.5 px-5 rounded-xl bg-gradient-to-r from-tiktokCyan via-sky-400 to-tiktokPink text-zinc-950 font-extrabold text-sm tracking-wide shadow-lg shadow-tiktokPink/15 hover:opacity-95 active:scale-[0.99] transition disabled:opacity-40 disabled:cursor-not-allowed">
+          Render Video TikTok (9:16)
+        </button>
+      </section>
+    </div>
+
+    <!-- Right Column: Progress, Preview Player & Outputs -->
+    <div class="lg:col-span-5 space-y-6">
+      <!-- Render Progress Card -->
+      <section class="rounded-2xl bg-zinc-900/70 border border-zinc-800 p-5 shadow-xl space-y-3">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-semibold text-white">Status Rendering</h2>
+          <span id="jobStatusBadge" class="text-[11px] px-2.5 py-0.5 rounded-full bg-zinc-800 text-zinc-400 font-medium">
+            Siap
+          </span>
+        </div>
+
+        <div class="space-y-1.5">
+          <div class="flex justify-between text-xs">
+            <span id="jobMessage" class="text-zinc-300 truncate pr-2">Pilih video &amp; tulis cerita untuk mulai.</span>
+            <span id="jobPct" class="font-mono text-tiktokCyan font-semibold">0%</span>
+          </div>
+          <div class="w-full h-2.5 rounded-full bg-zinc-950 border border-zinc-800 overflow-hidden">
+            <div id="jobProgressBar" class="h-full bg-gradient-to-r from-tiktokCyan to-tiktokPink transition-all duration-300" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <details class="text-xs">
+          <summary class="cursor-pointer text-zinc-400 hover:text-zinc-200 select-none">Lihat Log Proses</summary>
+          <pre id="jobLogs" class="mt-2 p-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-[11px] text-zinc-400 font-mono max-h-36 overflow-y-auto whitespace-pre-wrap">Belum ada log.</pre>
+        </details>
+      </section>
+
+      <!-- Video Preview Player (9:16 Frame) -->
+      <section class="rounded-2xl bg-zinc-900/70 border border-zinc-800 p-5 shadow-xl space-y-3">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-semibold text-white">Preview Player</h2>
+          <span id="playerLabel" class="text-[11px] text-zinc-400 truncate max-w-[200px]">Belum ada video dipilih</span>
+        </div>
+
+        <div class="flex justify-center">
+          <div class="w-full max-w-[290px] aspect-[9/16] rounded-2xl bg-zinc-950 border border-zinc-800 overflow-hidden flex items-center justify-center relative shadow-2xl">
+            <video id="previewPlayer" controls playsinline class="w-full h-full object-contain hidden"></video>
+            <div id="playerPlaceholder" class="text-center px-6 space-y-2">
+              <div class="w-12 h-12 mx-auto rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-500">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11v11.78a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+              </div>
+              <p class="text-xs text-zinc-400 font-medium">Belum ada video diputar</p>
+              <p class="text-[11px] text-zinc-600">Pilih video dari library atau putar hasil render.</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="playerActions" class="hidden flex flex-wrap gap-2 pt-1">
+          <a id="playerDownloadMp4" href="#" download class="flex-1 text-center py-2 px-3 rounded-xl bg-tiktokPink text-white font-semibold text-xs hover:opacity-90 transition">
+            Unduh .MP4
+          </a>
+          <a id="playerDownloadSrt" href="#" download class="hidden py-2 px-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-medium text-xs transition">
+            Unduh .SRT
+          </a>
+          <a id="playerDownloadThumb" href="#" download class="hidden py-2 px-3 rounded-xl bg-amber-500/15 text-amber-400 hover:bg-amber-500/25 border border-amber-500/30 font-medium text-xs transition">
+            Unduh Sampul (.JPG)
+          </a>
+        </div>
+      </section>
+
+      <!-- Rendered Outputs List -->
+      <section class="rounded-2xl bg-zinc-900/70 border border-zinc-800 p-5 shadow-xl space-y-3">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-semibold text-white">Daftar Hasil Render (<span id="outputsCount">0</span>)</h2>
+          <button id="refreshOutputsBtn" type="button" class="text-xs text-zinc-400 hover:text-white transition">Refresh</button>
+        </div>
+        <div id="outputsList" class="space-y-2.5 max-h-96 overflow-y-auto pr-1 text-xs">
+          <div class="text-zinc-500 py-4 text-center">Belum ada video yang dirender.</div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

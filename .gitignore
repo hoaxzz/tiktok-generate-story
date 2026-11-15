@@ -1,0 +1,51 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Temporary and render cache
+temp/*
+!temp/.gitkeep
+
+# Uploaded background videos and media (keep folder structure)
+uploads/*
+!uploads/.gitkeep
+!uploads/covers/
+!uploads/affiliates/
+
+uploads/covers/*
+!uploads/covers/.gitkeep
+
+uploads/affiliates/*
+!uploads/affiliates/.gitkeep
+
+# Rendered output files (MP4, JPG thumbnails, SRT, meta JSON)
+outputs/*
+!outputs/.gitkeep
+
+# 9Router local data
+9router-data/
+
+# Environment and sensitive keys
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Editor & OS artifacts
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini

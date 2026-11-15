@@ -1,0 +1,27 @@
+﻿services:
+  tiktok-studio:
+    build: .
+    container_name: tiktok_studio
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./outputs:/app/outputs
+    environment:
+      - PYTHONUNBUFFERED=1
+      - NINEROUTER_URL=http://nine-router:20128/v1
+    depends_on:
+      - nine-router
+
+  nine-router:
+    image: decolua/9router:latest
+    container_name: 9router_service
+    restart: unless-stopped
+    ports:
+      - "20128:20128"
+    volumes:
+      - ./9router-data:/app/data
+    environment:
+      - DATA_DIR=/app/data
+      - INITIAL_PASSWORD=admin123456
