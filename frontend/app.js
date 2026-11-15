@@ -26,6 +26,139 @@
 
   const $ = (id) => document.getElementById(id);
 
+  // ================= GLOBAL AUTH INTERCEPTOR & LOCK SCREEN =================
+  const rawFetch = window.fetch;
+  window.fetch = async function (input, init = {}) {
+    init = init || {};
+    init.headers = init.headers || {};
+    const token = localStorage.getItem("app_auth_token");
+    if (token) {
+      if (init.headers instanceof Headers) {
+        init.headers.set("X-App-Auth", token);
+      } else {
+        init.headers["X-App-Auth"] = token;
+      }
+    }
+    const res = await rawFetch(input, init);
+    const urlStr = typeof input === "string" ? input : input?.url || "";
+    if (res.status === 401 && !urlStr.includes("/api/auth/")) {
+      showLockScreen("Sesi kedaluwarsa atau belum login. Masukkan kata sandi studio.");
+    }
+    return res;
+  };
+
+  function showLockScreen(msg = "") {
+    const overlay = $("lockScreenOverlay");
+    if (!overlay) return;
+    overlay.classList.remove("hidden");
+    const errBox = $("lockErrorAlert");
+    if (errBox) {
+      if (msg) {
+        errBox.textContent = msg;
+        errBox.classList.remove("hidden");
+      } else {
+        errBox.classList.add("hidden");
+      }
+    }
+    $("lockPasswordInput")?.focus();
+    $("lockSessionBtn")?.classList.add("hidden");
+  }
+
+  function hideLockScreen() {
+    const overlay = $("lockScreenOverlay");
+    if (overlay) overlay.classList.add("hidden");
+    const errBox = $("lockErrorAlert");
+    if (errBox) errBox.classList.add("hidden");
+    if ($("lockPasswordInput")) $("lockPasswordInput").value = "";
+    $("lockSessionBtn")?.classList.remove("hidden");
+  }
+
+  async function checkAuthStatus() {
+    try {
+      const res = await rawFetch("/api/auth/status");
+      const data = await res.json();
+      if (data.auth_required) {
+        $("lockSessionBtn")?.classList.remove("hidden");
+        const token = localStorage.getItem("app_auth_token");
+        if (!data.logged_in && !token) {
+          showLockScreen();
+          return false;
+        }
+        // Validate saved token
+        const testRes = await rawFetch("/api/auth/status", {
+          headers: token ? { "X-App-Auth": token } : {},
+        });
+        const testData = await testRes.json();
+        if (!testData.logged_in) {
+          showLockScreen();
+          return false;
+        }
+      } else {
+        $("lockSessionBtn")?.classList.add("hidden");
+      }
+      hideLockScreen();
+      return true;
+    } catch {
+      return true;
+    }
+  }
+
+  // Lock Screen Form & Button Handlers
+  $("lockScreenForm")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const pwd = $("lockPasswordInput")?.value || "";
+    const btn = $("unlockBtn");
+    const origText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = "<span>Memeriksa sandi...</span>";
+
+    try {
+      const res = await rawFetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: pwd }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.detail || "Kata sandi salah.");
+      }
+      if (data.token) {
+        localStorage.setItem("app_auth_token", data.token);
+      }
+      hideLockScreen();
+      loadHealth();
+      loadLibrary();
+      loadAffiliates();
+      loadOutputs();
+      updateAffiliateUIState();
+    } catch (err) {
+      const errBox = $("lockErrorAlert");
+      if (errBox) {
+        errBox.textContent = err.message;
+        errBox.classList.remove("hidden");
+      }
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = origText;
+    }
+  });
+
+  $("togglePasswordVisibilityBtn")?.addEventListener("click", () => {
+    const inp = $("lockPasswordInput");
+    if (!inp) return;
+    inp.type = inp.type === "password" ? "text" : "password";
+  });
+
+  $("lockSessionBtn")?.addEventListener("click", async () => {
+    if (!confirm("Kunci studio sekarang?")) return;
+    try {
+      await rawFetch("/api/auth/logout", { method: "POST" });
+    } catch {}
+    localStorage.removeItem("app_auth_token");
+    showLockScreen("Studio telah dikunci. Masukkan sandi untuk masuk kembali.");
+  });
+
+
   function esc(str) {
     return String(str ?? "")
       .replace(/&/g, "&amp;")
@@ -1122,11 +1255,16 @@
   $("refreshOutputsBtn")?.addEventListener("click", loadOutputs);
 
   // Init
-  loadHealth();
-  loadLibrary();
-  loadAffiliates();
-  loadOutputs();
-  updateAffiliateUIState();
   updateStoryStats();
   updateLiveMockPreview();
+  (async () => {
+    const unlocked = await checkAuthStatus();
+    if (unlocked) {
+      loadHealth();
+      loadLibrary();
+      loadAffiliates();
+      loadOutputs();
+      updateAffiliateUIState();
+    }
+  })();
 })();

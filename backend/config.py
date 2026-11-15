@@ -42,3 +42,15 @@ THUMBNAIL_STYLES = {
     "cyan_neon": "Cyber Neon Cyan (Aksen Neon TikTok Cyan)",
     "clean_white": "Putih Tebal Minimalis (Outline Hitam + Bayangan)",
 }
+
+
+import os
+import hashlib
+
+APP_PASSWORD = os.getenv("APP_PASSWORD", "admin123").strip()
+AUTH_SECRET = os.getenv("AUTH_SECRET", "tiktok_studio_auth_salt_2026").strip()
+
+def get_auth_token(pwd: str) -> str:
+    return hashlib.sha256(f"{pwd}:{AUTH_SECRET}".encode("utf-8")).hexdigest()
+
+EXPECTED_AUTH_TOKEN = get_auth_token(APP_PASSWORD) if APP_PASSWORD else ""

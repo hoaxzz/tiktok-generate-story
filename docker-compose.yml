@@ -10,6 +10,7 @@
       - ./outputs:/app/outputs
     environment:
       - PYTHONUNBUFFERED=1
+      - APP_PASSWORD=admin123
       - NINEROUTER_URL=http://nine-router:20128/v1
     depends_on:
       - nine-router

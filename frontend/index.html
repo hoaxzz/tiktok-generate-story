@@ -45,10 +45,17 @@
         </div>
       </div>
 
-      <div id="healthBadges" class="flex flex-wrap items-center gap-2 text-xs">
-        <span class="px-2.5 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400">
-          Memeriksa sistem...
-        </span>
+      <div class="flex items-center gap-2.5 flex-wrap">
+        <div id="healthBadges" class="flex flex-wrap items-center gap-2 text-xs">
+          <span class="px-2.5 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400">
+            Memeriksa sistem...
+          </span>
+        </div>
+        <button id="lockSessionBtn" type="button" title="Kunci Sesi Studio"
+          class="hidden text-xs px-2.5 py-1 rounded-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white transition flex items-center gap-1.5 font-medium select-none">
+          <span>🔒</span>
+          <span class="hidden sm:inline">Kunci Studio</span>
+        </button>
       </div>
     </div>
   </header>
@@ -761,6 +768,47 @@
       </section>
     </div>
   </main>
+
+  <!-- Full-Screen Lock / Login Overlay -->
+  <div id="lockScreenOverlay" class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/95 backdrop-blur-2xl p-4 transition-all duration-300 hidden">
+    <div class="w-full max-w-md p-7 sm:p-8 rounded-3xl bg-zinc-900/90 border border-zinc-800 shadow-2xl space-y-6 text-center relative overflow-hidden">
+      <!-- Glow Accent -->
+      <div class="absolute -top-20 left-1/2 -translate-x-1/2 w-48 h-48 bg-gradient-to-br from-tiktokCyan/25 to-tiktokPink/25 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-tiktokCyan via-zinc-900 to-tiktokPink p-[2px] shadow-lg shadow-tiktokPink/20">
+        <div class="w-full h-full bg-zinc-950 rounded-[14px] flex items-center justify-center font-black text-xl">
+          <span class="text-tiktokCyan">9</span><span class="text-zinc-400">:</span><span class="text-tiktokPink">16</span>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="text-xl font-bold text-white tracking-tight">Studio Terkunci</h2>
+        <p class="text-xs text-zinc-400 mt-1">Masukkan kata sandi studio untuk membuka akses.</p>
+      </div>
+
+      <form id="lockScreenForm" class="space-y-4">
+        <div class="relative">
+          <input id="lockPasswordInput" type="password" placeholder="Masukkan kata sandi..." autocomplete="current-password" required
+            class="w-full rounded-xl bg-zinc-950 border border-zinc-700/80 px-4 py-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-tiktokCyan transition text-center tracking-wider" />
+          <button id="togglePasswordVisibilityBtn" type="button" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white text-xs select-none p-1">
+            👁️
+          </button>
+        </div>
+
+        <div id="lockErrorAlert" class="hidden text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-xl px-3 py-2 text-center"></div>
+
+        <button id="unlockBtn" type="submit"
+          class="w-full py-3 px-5 rounded-xl bg-gradient-to-r from-tiktokCyan via-sky-400 to-tiktokPink text-zinc-950 font-bold text-sm tracking-wide shadow-lg shadow-tiktokPink/20 hover:opacity-95 active:scale-[0.99] transition">
+          Buka Kunci Studio 🔓
+        </button>
+      </form>
+
+      <div class="text-[11px] text-zinc-500 pt-3 border-t border-zinc-800/80 space-y-1">
+        <div>Sandi default: <code class="text-zinc-300 font-mono">admin123</code></div>
+        <div class="text-[10px] text-zinc-600">Dapat diubah via variabel lingkungan <code class="text-zinc-400 font-mono">APP_PASSWORD</code> di VPS.</div>
+      </div>
+    </div>
+  </div>
 
   <script src="/static/app.js"></script>
 </body>

@@ -160,3 +160,18 @@ class JobStatusResponse(BaseModel):
     outputs: List[RenderedOutputItem] = Field(default_factory=list)
     video_metadata: Optional[VideoMetadata] = None
     error: Optional[str] = None
+
+
+class LoginRequest(BaseModel):
+    password: str
+
+
+class LoginResponse(BaseModel):
+    success: bool
+    token: Optional[str] = None
+    message: str
+
+
+class AuthStatusResponse(BaseModel):
+    auth_required: bool
+    logged_in: bool

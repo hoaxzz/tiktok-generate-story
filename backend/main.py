@@ -6,12 +6,14 @@ from pathlib import Path
 from typing import List, Optional
 
 import aiofiles
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, HTTPException, Request, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from backend.config import (
+    APP_PASSWORD,
+    EXPECTED_AUTH_TOKEN,
     AFFILIATES_DIR,
     ALLOWED_IMAGE_EXTENSIONS,
     ALLOWED_VIDEO_EXTENSIONS,
@@ -27,6 +29,9 @@ from backend.config import (
     VOICES,
 )
 from backend.models import (
+    AuthStatusResponse,
+    LoginRequest,
+    LoginResponse,
     JobStatusResponse,
     RenderRequest,
     RenderedOutputItem,
@@ -67,6 +72,36 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+@app.middleware("http")
+async def app_auth_middleware(request: Request, call_next):
+    if not APP_PASSWORD:
+        return await call_next(request)
+
+    path = request.url.path
+    # Public routes that can be loaded without auth
+    if (
+        path == "/"
+        or path.startswith("/static/")
+        or path == "/favicon.ico"
+        or path.startswith("/api/auth/")
+        or path == "/api/health"
+    ):
+        return await call_next(request)
+
+    token = (
+        request.headers.get("X-App-Auth")
+        or request.cookies.get("app_auth_token")
+        or request.query_params.get("auth")
+    )
+    if token != EXPECTED_AUTH_TOKEN:
+        return JSONResponse(
+            status_code=401,
+            content={"detail": "Akses ditolak. Silakan masukkan kata sandi studio terlebih dahulu."},
+        )
+
+    return await call_next(request)
+
 app.mount("/uploads", StaticFiles(directory=str(UPLOADS_DIR)), name="uploads")
 app.mount("/outputs", StaticFiles(directory=str(OUTPUTS_DIR)), name="outputs")
 app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
@@ -75,6 +110,45 @@ app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
 @app.get("/")
 async def serve_index():
     return FileResponse(str(FRONTEND_DIR / "index.html"))
+
+
+@app.get("/api/auth/status", response_model=AuthStatusResponse)
+async def api_auth_status(request: Request):
+    if not APP_PASSWORD:
+        return AuthStatusResponse(auth_required=False, logged_in=True)
+    token = (
+        request.headers.get("X-App-Auth")
+        or request.cookies.get("app_auth_token")
+        or request.query_params.get("auth")
+    )
+    logged_in = bool(token and token == EXPECTED_AUTH_TOKEN)
+    return AuthStatusResponse(auth_required=True, logged_in=logged_in)
+
+
+@app.post("/api/auth/login", response_model=LoginResponse)
+async def api_auth_login(req: LoginRequest, response: Response):
+    if not APP_PASSWORD:
+        return LoginResponse(success=True, token="no_auth", message="Login berhasil (tanpa proteksi sandi).")
+
+    if req.password.strip() == APP_PASSWORD:
+        token = EXPECTED_AUTH_TOKEN
+        response.set_cookie(
+            key="app_auth_token",
+            value=token,
+            max_age=30 * 24 * 3600,
+            httponly=False,
+            samesite="lax",
+            path="/",
+        )
+        return LoginResponse(success=True, token=token, message="Kata sandi benar. Selamat datang!")
+
+    raise HTTPException(status_code=401, detail="Kata sandi salah. Silakan periksa kembali.")
+
+
+@app.post("/api/auth/logout")
+async def api_auth_logout(response: Response):
+    response.delete_cookie(key="app_auth_token", path="/")
+    return {"success": True, "message": "Berhasil mengunci studio."}
 
 
 @app.get("/api/health", response_model=SystemHealthResponse)
